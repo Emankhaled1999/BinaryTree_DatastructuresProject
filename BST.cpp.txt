@@ -1,0 +1,375 @@
+file.cpp
+#include "BST.h"
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+
+
+BST::BST()  // default constructor 
+    
+{
+    ElementType data;
+    node* left=NULL;
+    node* right = NULL;
+    bool tagged = false;
+       
+}
+
+
+
+bool BST::empty() const 
+{
+	if (size==0);
+	return true;
+}
+
+
+
+
+int BST::size() const // number of nodes - tagged nodes
+{
+        return mysize - taggedsize;   
+}
+
+
+
+
+
+ BST::node* BST:: CreateLeaf(int data)
+{
+    node* n = new node();
+    n->data = data;
+    n->left = NULL;
+    n->right = NULL;
+
+}
+
+
+
+
+
+int BST::height(node* ptr) const   // height of tree by calculating left subtree and right subtree recursivly and compare who is big and adds 1 
+{
+    int h;
+    if (ptr == NULL)
+        return 0;
+    else
+    {
+        int Left = height(ptr->left);
+        int Right = height(ptr->right);
+        if (Left < Right)
+        {
+            h = 1 + Right;
+        }
+        else
+        {
+            h = 1 + Left;
+        }
+    }
+    return h;
+}
+
+
+
+
+
+
+bool BST:: search(node* root, const ElementType key) const
+{
+    
+    if (root->data == key)
+    {
+        return true;
+    }
+    else
+    {
+        if (key < root->data)
+        {
+            return search(root->left, key);
+        }
+        else
+        {
+            return search(root->right, key);
+        }
+    
+    }
+    return false; 
+}
+
+
+
+
+
+
+bool BST:: member(int const& obj) const   // found=true & tag=false
+{
+    node* ptr = root;
+    while ( ptr != NULL)
+    {
+        if ((search(root, obj) == true) && (root->tagged == false))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+}
+
+
+
+
+
+
+ElementType BST::front() const  // find min number with tag equal false , if not else return its parent
+{
+    node* ptr = root;
+    node* parent;
+    while (ptr != NULL)
+    {
+        parent = ptr;
+        ptr = ptr->left;
+    }
+    if (ptr->tagged == true)
+        return (parent->data);
+    else return (ptr->data);
+}
+
+
+
+
+
+ElementType BST:: back() const  // find max number with tag equal false , if not else return its parent
+{
+    node* ptr = root;
+    node* parent;
+    while (ptr != NULL)
+    {
+        parent = ptr;
+        ptr = ptr->right;
+    }
+    if (ptr->tagged == true)
+        return (parent->data);
+    else return (ptr->data);
+}
+
+
+
+
+
+void BST::breadth_first_traversal( node* root) const
+{
+    bool tag= false;
+    if (root == NULL) return;
+    queue <node*> q;
+    q.push(root);
+    while (!q.empty()) {
+         node* temp = q.front();
+
+         if (temp->tagged == false)
+         {
+             cout << temp->data << " ";
+         }
+         else
+         {
+             cout << temp->data << "x" << " ";
+         }
+        if (temp->left != NULL)
+            q.push(temp->left);
+
+        if (temp->right != NULL)
+            q.push(temp->right);
+        q.pop();
+    }
+}
+
+
+
+
+bool BST:: insert(ElementType const item)   /*--------------------------------------------------------------------
+	 Insert the new object into the tree: 
+	 If the object is already in the tree and not tagged as erased, return false and do nothing; 
+	 if the object is already in the tree but tagged as erased, untag it and return true; 
+	 if the object is not in the tree, create a new leaf node in the appropriate location and return true. 
+	 If the root node is nullptr, this requires the creation of a new root node; 
+	 otherwise, the corresponding function is called on the root node. 
+	---------------------------------------------------------------------*/
+{
+    node* ptr = root;
+    if (empty())
+    {
+        root = CreateLeaf(item);
+        mysize++;
+        return true;
+    }
+    while (ptr != NULL)
+    {
+        if ((search(ptr, item) == true) && (ptr->tagged == false))
+        {
+            return false;
+        }
+        else if ((search(ptr, item) == true) && (ptr->tagged == true))  
+        {
+            ptr->tagged = false;
+            taggedsize--;
+            return true;
+        }
+        else if (!search(ptr, item)) //not found so insert the new node 
+        {
+            if (ptr->data < item) // check if item is smaller than the ptr so insert it somewhere on left
+            {
+                ptr = ptr->left;
+            }
+            else               // check if item is greater than the ptr so insert it somewhere on right
+            {
+                ptr = ptr->right;
+            }
+        }
+    }
+    if (ptr->data < item)
+    {
+        CreateLeaf(item);
+        mysize++;
+        return true;
+    }
+    else if (ptr->data < item)
+    {
+        CreateLeaf(item);
+        mysize++;
+        return true;
+    }
+
+        
+}
+
+
+
+
+bool BST::erase(ElementType const item) /*
+	 Removes the object from the tree: 
+	 If the object is not already in the tree, return false;
+	 if the object is in the tree but tagged as erased, return false;
+	 if the object is in the tree and not tagged as erased, tag it as erased and return true.
+	 If the root node is nullptr, all that is done is that false is returned; 
+	 otherwise, the corresponding function is called on the root node.
+	*/
+{
+    node* ptr = root;
+    if (empty())
+    {
+        return false;
+    }
+    while (ptr != NULL)
+    {
+        if (!search(ptr, item))
+        {
+            return false;
+        }
+        else if ((search(ptr, item) == true) && (ptr->tagged == true))
+        {
+            return false;
+        }
+        else if ((search(ptr, item) == true) && (ptr->tagged == false))
+        {
+            ptr->tagged = true;
+            taggedsize++;
+            return true;
+        }
+    }
+}
+
+
+
+
+
+void BST:: clear(node* ptr ) //delete all nodes in tree
+{
+    ptr = root;
+    if (root == NULL)
+        return;
+    clear(ptr->left);
+    clear(ptr->right);
+    free(ptr);
+   
+}
+
+
+
+
+void BST::clean() //delete nodes marked as erased 
+{
+    if (erase(item))
+    {
+        bool found;                      // if item is found
+        BST::NodePointer x, parent;      // x points to node to be deleted , parent points to parent of x and xsucc
+
+        search2(item, found, x, parent);
+
+        if (!found)
+        {
+            cout << "Item not in the BST";
+            return;
+        }
+        // node has 2 children
+        if (x->left != 0 && x->right != 0)
+        {
+            // Find x's inorder successor and its parent
+            BST::NodePointer xSucc = x->right;
+            parent = x;
+            while (xSucc->left != 0)       // descend left
+            {
+                parent = xSucc;
+                xSucc = xSucc->left;
+            }
+
+            // Move contents of xSucc to x and change x
+            // to point to successor, which will be removed.
+            x->data = xSucc->data;
+            x = xSucc;
+        }
+
+        //  node has 0 or 1 child
+        BST::NodePointer
+            subtree = x->left;             // pointer to a subtree of x
+        if (subtree == 0)
+            subtree = x->right;
+        if (parent == 0)                  // root being removed
+            root = subtree;
+        else if (parent->left == x)       // left child of parent
+            parent->left = subtree;
+        else                              // right child of parent
+            parent->right = subtree;
+        delete x;
+    }
+}
+
+
+
+
+
+void BST::search2(const ElementType& item, bool& found,
+    BST::NodePointer& itemPtr,                 //pointer to item we want to delete
+    BST::NodePointer& parent) const            // pointer to item's parent node
+{
+    NodePointer root;
+         root = itemPtr ;
+    parent = 0;
+    found = false;
+    while (!found && itemPtr != 0)
+    {
+        if (item < itemPtr->data)       // descend left
+        {
+            parent = itemPtr;
+            itemPtr = itemPtr->left;
+        }
+        else if (itemPtr->data < item)  // descend right
+        {
+            parent = itemPtr;
+            itemPtr = itemPtr->right;
+        }
+        else                           // item found
+            found = true;
+    }
+}

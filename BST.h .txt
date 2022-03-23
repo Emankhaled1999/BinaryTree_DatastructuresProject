@@ -1,0 +1,53 @@
+file .h
+
+#pragma once
+typedef int ElementType;
+
+class BST
+{
+
+private: 
+	class node
+	{ 
+	public:
+		ElementType data;
+		node* left;
+		node* right;
+		bool tagged;
+		 BST:: node() // create new empty node 
+			:data(0), left(0), right(0) , tagged(0)
+		{}
+
+		// Explicit Value -- data part contains item; both links are null.
+		BST:: node(ElementType item) // create new node with value
+			: data(item), left(0), right(0) , tagged(0)
+		{}
+	};
+	 typedef node* NodePointer;
+
+
+
+public:
+	BST();
+	node* CreateLeaf(int data); // create new leaf , will be using it in insert function 
+	bool empty() const;
+	int size() const;
+	int height(node* ptr ) const;
+	bool search(node* root, const ElementType key) const;
+	bool member(int const& obj) const;
+	ElementType front() const;
+	ElementType back() const;
+	void breadth_first_traversal(node* root) const;
+	bool insert(ElementType const);
+	bool erase(ElementType const);
+	void clear(node* ptr);
+	void clean();
+	void search2(const ElementType& item, bool& found,
+		NodePointer& itemPtr, NodePointer& parent) const;
+
+private:
+	NodePointer root;
+	int mysize;
+	int taggedsize;
+
+};
